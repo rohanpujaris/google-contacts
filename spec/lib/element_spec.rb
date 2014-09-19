@@ -27,6 +27,16 @@ describe GContacts::Element do
       Time.any_instance.stub(:iso8601).and_return("2012-04-06T06:02:04Z")
     end
 
+    it 'with escaping HTML chars' do
+      element = GContacts::Element.new('title' => 'Tom & Jerry', 'content' => 'A & B')
+
+      element.create
+      xml = element.to_xml(true)
+
+      xml.should =~ %r{<atom:title>Tom &amp; Jerry</atom:title>}
+      xml.should =~ %r{<atom:content type='text'>A &amp; B</atom:content>}
+    end
+
     it "with batch used" do
       element = GContacts::Element.new
 
