@@ -108,6 +108,25 @@ describe GContacts::Client do
       contact.addresses.should == [{"gd:formattedAddress"=>"5 Market St\n        San Francisco\n        CA", "type"=>"http://schemas.google.com/g/2005#home"}]
     end
 
+    it 'loads all from a group' do
+      mock_response(File.read("spec/responses/contacts/all_by_group.xml")) do |http_mock, res_mock|
+        http_mock.should_receive(:request_get).with("/m8/feeds/contacts/default/full?updated-min=1234&group=http%3A%2F%2Fwww.google.com%2Fm8%2Ffeeds%2Fgroups%2Fjohn.doe%40gmail.com%2Fbase%2F6", hash_including("Authorization" => "Bearer 12341234")).and_return(res_mock)
+      end
+
+      client = GContacts::Client.new(:access_token => "12341234")
+      contacts = client.all(:params => {"updated-min" => "1234", group: {email_id: 'john.doe@gmail.com', id: '6'}})
+
+      contacts.id.should == "john.doe@gmail.com"
+      contacts.updated.to_s.should == "2012-04-05T21:46:31.537Z"
+      contacts.title.should == "Johnny's Contacts"
+      contacts.author.should == {"name" => "Johnny", "email" => "john.doe@gmail.com"}
+      contacts.next_uri.should be_nil
+      contacts.per_page.should == 25
+      contacts.start_index.should == 1
+      contacts.total_results.should == 3
+      contacts.should have(3).items
+    end
+
     it "paginates through all" do
       request_uri = ["/m8/feeds/contacts/default/full", "/m8/feeds/contacts/john.doe%40gmail.com/full?start-index=3&max-results=2", "/m8/feeds/contacts/john.doe%40gmail.com/full?start-index=5&max-results=2"]
       request_uri.each_index do |i|

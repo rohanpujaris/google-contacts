@@ -10,7 +10,8 @@ module GContacts
   class Client
     attr_reader :options
 
-    API_URI = {
+    GROUP_URI = 'http://www.google.com/m8/feeds/groups/'
+    API_URI   = {
       :oauth => {:update => "https://accounts.google.com/o/oauth2/token"},
       :contacts => {:all => "https://www.google.com/m8/feeds/contacts/default/%s",
                     :get => "https://www.google.com/m8/feeds/contacts/default/%s/%s",
@@ -291,6 +292,10 @@ module GContacts
                 when :updated_after
                   value = value.iso8601 if value.respond_to? :iso8601
                   'updated-min'
+                # use group param to find contacts for individual group
+                when :group
+                  value = GROUP_URI + value[:email_id] + '/base/' + value[:id]
+                  'group'
                 else key
                 end
 
@@ -301,9 +306,10 @@ module GContacts
     end
 
     def http_request(method, uri, args)
-      query_string = build_query_string(args[:params])
-      token = @options[:access_token]
-      headers = args[:headers] || {}
+      query_string  = build_query_string(args[:params])
+      token         = @options[:access_token]
+      headers       = args[:headers] || {}
+
       headers["GData-Version"] = "3.0"
 
       if token.is_a?(String)
