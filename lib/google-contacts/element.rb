@@ -344,7 +344,7 @@ module GContacts
 
           data.each do |key, value|
             next unless key =~ /^@(.+)/
-            xml << " #{$1}='#{value}'"
+            xml << " #{$1}=\"#{value}\""
             misc_keys -= 1
           end
 
