@@ -134,6 +134,10 @@ module GContacts
       nodes.each do |address|
         new_address = {}
         new_address['gd:formattedAddress'] = address['gd:formattedAddress']
+        new_address['street']              = address['gd:street']
+        new_address['city']                = address['gd:city']
+        new_address['state']               = address['gd:state']
+        new_address['country']             = address['gd:country']
         unless address['@rel'].nil?
           new_address['type'] = address['@rel']
         else
@@ -156,7 +160,8 @@ module GContacts
         type = address['type'].split("#").last
         text = address['gd:formattedAddress']
         @hashed_addresses.merge!(type => []) unless(@hashed_addresses[type])
-        @hashed_addresses[type] << text
+        @hashed_addresses[type] << { full_address: text, street: address['street'], city: address['city'],
+          state: address['state'], country: address['country'] }
       end if @addresses.any?
 
       @hashed_phone_numbers = {}

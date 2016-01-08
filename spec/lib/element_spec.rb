@@ -138,11 +138,11 @@ describe GContacts::Element do
     let(:element) {GContacts::Element.new(parser.parse(File.read("spec/responses/contacts/contact_with_all_data.xml"))["entry"])}
 
     it '#hashed_email_addresses' do
-      element.hashed_email_addresses.should == {"work"=>["casey@gmail.com"], "home"=>["casey.1900@gmail.com", "casey_case@gmail.com"]}
+      element.hashed_email_addresses.should == { "work"=>["casey@gmail.com"], "home"=>["casey.1900@gmail.com", "casey_case@gmail.com"] }
     end
 
     it '#hashed_addresses' do
-      element.hashed_addresses.should == {"home"=>["Xolo\n      Dome\n      Krypton"], "work"=>["Nokia Lumia 720\n      Finland\n      Earth"]}
+      element.hashed_addresses.should == {"home" => [{:full_address=>"Xolo\n      Dome\n      Krypton", :street=>"Xolo", :city=>"Dome", :state=>nil, :country=>"USA"}], "work" => [{:full_address=>"Nokia Lumia 720\n      Finland\n      Earth", :street=>"Nokia Limia 720", :city=>"Finland", :state=>nil, :country=>nil}]}
     end
 
     it '#hashed_phone_numbers' do
